@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud{
+    int valeur ;
+    struct Noeud* next;
+}Noeud;
+
+typedef Noeud* noeud;
+
+void empiler(noeud *s, int val){
+    noeud newE=(noeud) malloc (sizeof(Noeud));
+    if(newE!=NULL){
+        newE->valeur=val;
+        newE->next=*s;
+        *s=newE;
+        printf("l'element %d a ete empiler\n",val);
+    }
+        }
+        
+        void depiler(noeud *s){
+            if(*s==NULL)
+                printf("la pile est vide\n");
+
+                else {
+                    noeud temp=*s;
+                    *s=(*s)->next;
+                    printf("l'element %d a ete depiler\n",temp->valeur);
+                    free(temp);
+
+                }
+            }
+
+            void sommet(noeud *s){
+                if(*s==NULL)
+            printf("la pile est vide\n");
+        else 
+         printf("le sommet de la pile est %d\n",(*s)->valeur);
+
+            }
+
+            void afficher (noeud s){
+                if(s==NULL)
+                printf("la pile est vide\n");
+                else{
+                    noeud temp=s;
+                    while (temp!=NULL){
+                        printf("%d\n",temp->valeur);
+                        temp=temp->next;
+                    
+                    }
+                }
+            }
+                    
+            int taille (noeud s){
+                int cpt=0;
+                noeud temp=s;
+                while(temp!=NULL){
+                    cpt++;
+                    temp=temp->next;
+                }
+
+            }
+        
+    int main() {
+    noeud s = NULL;
+
+    empiler(&s, 10);
+    empiler(&s, 20);
+    empiler(&s, 30);
+
+    
+    printf("Pile après empilement de 10, 20, 30:\n");
+    afficher(s);
+
+    sommet(&s);
+
+    printf("La taille de la pile est : %d\n", taille(s));
+
+    depiler(&s);
+    depiler(&s);
+
+    printf("Pile après deux dépilements:\n");
+    afficher(s);
+
+    return 0;
+}
