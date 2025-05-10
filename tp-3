@@ -1,0 +1,256 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+    struct Noeud *precedent;
+} Noeud;
+
+typedef Noeud* Liste; 
+
+Liste creer(int valeur) {
+    Liste nv = (Liste)malloc(sizeof(Noeud));
+    if (!nv) return NULL;
+    nv->valeur = valeur;
+    nv->suivant = NULL;
+    nv->precedent = NULL;
+    return nv;
+}
+
+void affiche(Liste debut) {
+    Liste tem = debut;
+    while (tem) {
+        printf("%d ", tem->valeur);
+        tem = tem->suivant;
+    }
+    printf("\n");
+}
+
+void afficheInverse(Liste debut) {
+    Liste tem = debut;
+    if (!tem) return;
+
+    while (tem->suivant) {
+        tem = tem->suivant;
+    }
+
+    while (tem) {
+        printf("%d ", tem->valeur);
+        tem = tem->precedent;
+    }
+    printf("\n");
+}
+
+Liste ajouterD(Liste debut, int valeur) {
+    Liste nv = creer(valeur);
+    if (!nv) return debut;
+    if (debut) {
+        debut->precedent = nv;
+        nv->suivant = debut;
+    }
+    return nv;
+}
+
+Liste ajouterF(Liste debut, int valeur) {
+    Liste nv = creer(valeur);
+    if (!nv) return debut;
+    if (!debut) return nv;
+    
+    Liste tem = debut;
+    while (tem->suivant) {
+        tem = tem->suivant;
+    }
+
+    tem->suivant = nv;
+    nv->precedent = tem;
+    return debut;
+}
+
+int taille(Liste debut) {
+    int c = 0;
+    Liste tem = debut;
+    while (tem) {
+        c++;
+        tem = tem->suivant;
+    }
+    return c;
+}
+
+Liste insertion(Liste debut, int pos, int valeur) {
+    if (pos < 1 || pos > taille(debut) + 1) 
+    return debut;
+    if (pos == 1) 
+    return ajouterD(debut, valeur);
+
+    Liste tem = debut;
+    for (int i = 1; i < pos - 1; i++) {
+        tem = tem->suivant;
+    }
+
+    Liste nv = creer(valeur);
+    nv->suivant = tem->suivant;
+    if (tem->suivant) 
+    tem->suivant->precedent = nv;
+    tem->suivant = nv;
+    nv->precedent = tem;
+    return debut;
+}
+
+void rechercher(Liste debut, int valeur) {
+    Liste tem = debut;
+    while (tem) {
+        if (tem->valeur == valeur)
+         return tem;
+        tem = tem->suivant;
+    }
+    ;
+}
+
+
+Liste suppressionD(Liste debut) {
+    if (!debut) return NULL;
+    Liste tmp = debut;
+    debut = debut->suivant;
+    if (debut) 
+    debut->precedent = NULL;
+    free(tmp);
+    return debut;
+}
+
+Liste suppressionF(Liste debut) {
+    if (!debut) return NULL;
+    if (!debut->suivant) {
+        free(debut);
+        return NULL;
+    }
+
+    Liste tem = debut;
+    while (tem->suivant)
+     tem = tem->suivant;
+
+    tem->precedent->suivant = NULL;
+    free(tem);
+    return debut;
+}
+
+Liste suppressionP(Liste debut, int pos) {
+    if (pos < 1 || pos > taille(debut))
+     return debut;
+    if (pos == 1)
+     return suppressionD(debut);
+
+    Liste tem = debut;
+    for (int i = 1; i < pos; i++) {
+        tem = tem->suivant;
+    }
+
+    if (tem->suivant)
+    tem->suivant->precedent = tem->precedent;
+    tem->precedent->suivant = tem->suivant;
+    free(tem);
+    return debut;
+}
+
+Liste modifierD(Liste debut, int valeur) {
+    if (debut) debut->valeur = valeur;
+    return debut;
+}
+
+Liste modifierF(Liste debut, int valeur) {
+    if (!debut) return NULL;
+    Liste tem = debut;
+    while (tem->suivant) 
+    tem = tem->suivant;
+    tem->valeur = valeur;
+    return debut;
+}
+
+Liste modifierP(Liste debut, int pos, int valeur) {
+    if (pos < 1 || pos > taille(debut))
+     return debut;
+    Liste tem = debut;
+    for (int i = 1; i < pos; i++) 
+    tem = tem->suivant;
+    tem->valeur = valeur;
+    return debut;
+}
+
+Liste trier(Liste debut) {
+    if (!debut) return NULL;
+    int t = taille(debut);
+    for (int i = 0; i < t - 1; i++) {
+        Liste tem = debut;
+        while (tem->suivant) {
+            if (tem->valeur > tem->suivant->valeur) {
+                int tmp = tem->valeur;
+                tem->valeur = tem->suivant->valeur;
+                tem->suivant->valeur = tmp;
+            }
+            tem = tem->suivant;
+        }
+    }
+    return debut;
+}
+
+int main() {
+    Liste maListe = NULL;
+
+    maListe = ajouterF(maListe, 30);
+    maListe = ajouterF(maListe, 10);
+    maListe = ajouterF(maListe, 20);
+    maListe = ajouterF(maListe, 40);
+
+    printf("Liste initiale : ");
+    affiche(maListe);
+
+    printf("Affichage inverse : ");
+    afficheInverse(maListe);
+
+    printf("Taille : %d\n", taille(maListe));
+
+    printf("Ajout au début (5) : ");
+    maListe = ajouterD(maListe, 5);
+    affiche(maListe);
+
+    printf("Ajout à la position 3 (15) : ");
+    maListe = insertion(maListe, 3, 15);
+    affiche(maListe);
+
+    printf("Recherche de 20 : ");
+    rechercher(maListe, 20);
+    if (rechercher) 
+    printf("la valeur existe\n");
+    else 
+    printf("Non trouvé\n");
+
+    printf("Suppression début : ");
+    maListe = suppressionD(maListe);
+    affiche(maListe);
+
+    printf("Suppression fin : ");
+    maListe = suppressionF(maListe);
+    affiche(maListe);
+
+    printf("Suppression à la position 2 : ");
+    maListe = suppressionP(maListe, 2);
+    affiche(maListe);
+
+    printf("Modifier début à 100 : ");
+    maListe = modifierD(maListe, 100);
+    affiche(maListe);
+
+    printf("Modifier fin à 200 : ");
+    maListe = modifierF(maListe, 200);
+    affiche(maListe);
+
+    printf("Modifier position 2 à 150 : ");
+    maListe = modifierP(maListe, 2, 150);
+    affiche(maListe);
+
+    printf("Trier la liste : ");
+    maListe = trier(maListe);
+    affiche(maListe);
+
+    return 0;
+}
