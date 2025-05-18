@@ -1,87 +1,151 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Noeud{
-    int valeur ;
-    struct Noeud* next;
-}Noeud;
+typedef struct Noeud {
+    int valeur;
+    struct Noeud* suivant;
+} Noeud;
 
 typedef Noeud* noeud;
 
-void empiler(noeud *s, int val){
-    noeud newE=(noeud) malloc (sizeof(Noeud));
-    if(newE!=NULL){
-        newE->valeur=val;
-        newE->next=*s;
-        *s=newE;
-        printf("l'element %d a ete empiler\n",val);
+
+void Push(noeud* Top, int valeur) {
+    noeud nouveau = (noeud)malloc(sizeof(Noeud));
+    if (nouveau != NULL) {
+        nouveau->valeur = valeur;
+        nouveau->suivant = *Top;
+        *Top = nouveau;
+        printf("L'element %d a ete empile .\n", valeur);
     }
+}
+
+void Pop(noeud* Top) {
+    if (*Top == NULL) {
+        printf("La pile est vide.\n");
+    } else {
+        noeud temp = *Top;
+        *Top = (*Top)->suivant;
+        printf("L'element %d a ete depile.\n", temp->valeur);
+        free(temp);
+    }
+}
+
+void peek(noeud* Top) {
+    if (*Top == NULL) {
+        printf("La pile est vide.\n");
+    } else {
+        printf("Le sommet de la pile  est : %d\n", (*Top)->valeur);
+    }
+}
+
+void afficher(noeud Top) {
+    if (Top == NULL)
+        printf("La pile est vide.\n");
+    else {
+        printf("Contenu de la pile :\n");
+        noeud temp = Top;
+        while (temp != NULL) {
+            printf("%d\n", temp->valeur);
+            temp = temp->suivant;
         }
-        
-        void depiler(noeud *s){
-            if(*s==NULL)
-                printf("la pile est vide\n");
+    }
+}
 
-                else {
-                    noeud temp=*s;
-                    *s=(*s)->next;
-                    printf("l'element %d a ete depiler\n",temp->valeur);
-                    free(temp);
+int taille(noeud Top) {
+    int compteur = 0;
+    noeud temp = Top;
+    while (temp != NULL) {
+        compteur++;
+        temp = temp->suivant;
+    }
+    return compteur;
+}
 
-                }
-            }
+//file
 
-            void sommet(noeud *s){
-                if(*s==NULL)
-            printf("la pile est vide\n");
-        else 
-         printf("le sommet de la pile est %d\n",(*s)->valeur);
+noeud debut = NULL;
+noeud fin = NULL;
 
-            }
+void enfiler(int valeur) {
+    noeud nouveau = (noeud)malloc(sizeof(Noeud));
+    nouveau->valeur = valeur;
+    nouveau->suivant = NULL;
 
-            void afficher (noeud s){
-                if(s==NULL)
-                printf("la pile est vide\n");
-                else{
-                    noeud temp=s;
-                    while (temp!=NULL){
-                        printf("%d\n",temp->valeur);
-                        temp=temp->next;
-                    
-                    }
-                }
-            }
-                    
-            int taille (noeud s){
-                int cpt=0;
-                noeud temp=s;
-                while(temp!=NULL){
-                    cpt++;
-                    temp=temp->next;
-                }
+    if (fin == NULL) {
+        debut = fin = nouveau;
+    } else {
+        fin->suivant = nouveau;
+        fin = nouveau;
+    }
+    printf("L'element %d a ete enfile.\n", valeur);
+}
 
-            }
-        
-    int main() {
-    noeud s = NULL;
+void defiler() {
+    if (debut == NULL) {
+        printf("La file est vide.\n");
+        return;
+    }
+    noeud temp = debut;
+    debut = debut->suivant;
+    if (debut == NULL)
+        fin = NULL;
+    printf("L'element %d a ete defile.\n", temp->valeur);
+    free(temp);
+}
 
-    empiler(&s, 10);
-    empiler(&s, 20);
-    empiler(&s, 30);
+void afficherFile() {
+    if (debut == NULL) {
+        printf("La file est vide.\n");
+        return;
+    }
+    printf("Contenu de la file : ");
+    noeud temp = debut;
+    while (temp != NULL) {
+        printf("%d ", temp->valeur);
+        temp = temp->suivant;
+    }
+    printf("\n");
+}
 
-    
-    printf("Pile après empilement de 10, 20, 30:\n");
-    afficher(s);
+void viderFile() {
+    while (debut != NULL){
+        defiler();
+    }
+}
 
-    sommet(&s);
 
-    printf("La taille de la pile est : %d\n", taille(s));
+void testerPile() {
+    noeud Top = NULL;
+    printf("\n=== TEST DE LA PILE ===\n");
+    Push(&Top, 10);
+    Push(&Top, 20);
+    Push(&Top, 30);
+    afficher(Top);
+    peek(&Top);
+    printf("Taille de la pile : %d\n", taille(Top));
+    Pop(&Top);
+    afficher(Top);
+}
 
-    depiler(&s);
-    depiler(&s);
+void testerFile() {
+    printf("\n=== TEST DE LA FILE ===\n");
+    enfiler(100);
+    enfiler(200);
+    enfiler(300);
+    afficherFile();
+    defiler();
+    afficherFile();
+    enfiler(400);
+    viderFile();
+    afficherFile();
+}
 
-    printf("Pile après deux dépilements:\n");
-    afficher(s);
 
-    return 0;
+int main() {
+
+    testerPile();
+    testerFile();
+
+ return 0;
+
 }
