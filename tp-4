@@ -1,0 +1,195 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Etudiant {
+    int id;
+    char nom[50];
+    float moyenne;
+    struct Etudiant* suivant;
+    struct Etudiant* precedent;
+} Etudiant;
+
+typedef Etudiant* List;
+
+List cree_etudiant() {
+    List NV = (List)malloc(sizeof(Etudiant));
+    if (NV == NULL) {
+        printf("Erreur d'allocation\n");
+        return NULL;
+    }
+    printf("Entrez L'ID de l'etudiant : \n");
+    scanf("%d", &NV->id);
+    printf("Entrez le nom de l'etudiant : \n");
+    scanf("%s", NV->nom);
+    printf("Entrez la moyenne de l'etudiant : \n");
+    scanf("%f", &NV->moyenne);
+    NV->suivant = NULL;
+    NV->precedent = NULL;
+    return NV;
+}
+
+int longueur(List head) {
+    int cmpt = 0;
+    while (head != NULL) {
+        cmpt++;
+        head = head->suivant;
+    }
+    return cmpt;
+}
+
+List ajouter_position(List head, List NV, int pos) {
+    if (pos < 1) {
+        printf("Position invalide\n");
+        return head;
+    }
+    if (pos == 1) {
+        NV->suivant = head;
+        if (head != NULL) {
+            head->precedent = NV;
+        }
+        return NV;
+    }
+    List tmp = head;
+    int i = 1;
+    while (tmp != NULL && i < pos - 1) {
+        tmp = tmp->suivant;
+        i++;
+    }
+    if (tmp == NULL) {
+        printf("Position se trouve en dehors de la liste\n");
+        return head;
+    }
+    NV->suivant = tmp->suivant;
+    NV->precedent = tmp;
+    if (tmp->suivant != NULL) {
+        tmp->suivant->precedent = NV;
+    }
+    tmp->suivant = NV;
+    return head;
+}
+
+List supprimer_position(List head, int pos) {
+    if (pos < 1) {
+        printf("Position invalide\n");
+        return head;
+    }
+    List tmp = head;
+    int i = 1;
+    while (tmp != NULL && i < pos) {
+        tmp = tmp->suivant;
+        i++;
+    }
+    if (tmp == NULL) {
+        printf("Position se trouve en dehors de la liste\n");
+        return head;
+    }
+    if (tmp->precedent != NULL) {
+        tmp->precedent->suivant = tmp->suivant;
+    } else {
+        head = tmp->suivant;
+    }
+    if (tmp->suivant != NULL) {
+        tmp->suivant->precedent = tmp->precedent;
+    }
+    free(tmp);
+    return head;
+}
+
+void afficher_liste(List head) {
+    List tmp = head;
+    while (tmp != NULL) {
+        printf("L'ID: %d, Nom: %s, Moyenne: %.2f\n", tmp->id, tmp->nom, tmp->moyenne);
+        tmp = tmp->suivant;
+    }
+}
+
+List derniere_cellule(List head) {
+    List tmp = head;
+    while (tmp != NULL && tmp->suivant != NULL) {
+        tmp = tmp->suivant;
+    }
+    return tmp;
+}
+
+void afficher_liste_inverse(List dernier) {
+    List tmp = dernier;
+    while (tmp != NULL) {
+        printf("L'ID: %d, Nom: %s, Moyenne: %.2f\n", tmp->id, tmp->nom, tmp->moyenne);
+        tmp = tmp->precedent;
+    }
+}
+
+int chercher_etudiant(List head, int id) {
+    List tmp = head;
+    while (tmp != NULL) {
+        if (tmp->id == id) {
+            return 1;
+        }
+        tmp = tmp->suivant;
+    }
+    return 0;
+}
+
+int main() {
+    List head = NULL;
+    int choix, pos, id;
+
+    do {
+        printf("\n=== Menu de gestion des etudiants: ===\n");
+        printf("1. Ajouter un etudiant\n");
+        printf("2. Afficher la liste des etudiants\n");
+        printf("3. Ajouter un etudiant a une position donnee\n");
+        printf("4. Supprimer un etudiant a une position donnee\n");
+        printf("5. Rechercher un etudiant par L'ID\n");
+        printf("6. Afficher la liste des etudiants en sens inverse\n");
+        printf("7. Quitter\n");
+        printf("Choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1: {
+                List etudiant = cree_etudiant();
+                head = ajouter_position(head, etudiant, 1);
+                break;
+            }
+            case 2:
+                afficher_liste(head);
+                break;
+            case 3: {
+                printf("Entrez la position a laquelle ajouter l'etudiant : ");
+                scanf("%d", &pos);
+                List etudiant = cree_etudiant();
+                head = ajouter_position(head, etudiant, pos);
+                break;
+            }
+            case 4: {
+                printf("Entrez la position a laquelle supprimer l'etudiant : ");
+                scanf("%d", &pos);
+                head = supprimer_position(head, pos);
+                break;
+            }
+            case 5: {
+                printf("Entrez ID de l'etudiant a rechercher : ");
+                scanf("%d", &id);
+                if (chercher_etudiant(head, id)) {
+                    printf("L'etudiant avec ID %d a ete trouve.\n", id);
+                } else {
+                    printf("L'etudiant avec ID %d n'a pas ete trouve.\n", id);
+                }
+                break;
+            }
+            case 6: {
+                List dernier = derniere_cellule(head);
+                afficher_liste_inverse(dernier);
+                break;
+            }
+            case 7:
+                printf("Au revoir\n");
+                break;
+            default:
+                printf("Choix invalide\n");
+        }
+    } while (choix != 7);
+
+ return 0;
+}
